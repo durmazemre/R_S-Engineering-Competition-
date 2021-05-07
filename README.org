@@ -7,10 +7,10 @@
 figure out modulation type and order by looking at this scatter plot
 
 considerations:
-can use ML or classical methods (using probability models)
-in the program itself:
-- use probabilities
-- maybe have it so that it can take work with a portion of the data and later efficiently incorporate more data if it is needed
+- can use ML or classical methods (using probability models)
+- in the program itself:
+    - use probabilities
+    - maybe have it so that it can take work with a portion of the data and later efficiently incorporate more data if it is needed
 
 * resources
 - "Rohde Schwarz - YouTube" [[https://www.youtube.com/channel/UCoJfm2BU72j699FH3IUr3mg]]
