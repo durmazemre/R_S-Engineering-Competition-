@@ -13,6 +13,7 @@ in the program itself:
 - maybe have it so that it can take work with a portion of the data and later efficiently incorporate more data if it is needed
 
 * resources
-"Rohde Schwarz - YouTube" (https://www.youtube.com/channel/UCoJfm2BU72j699FH3IUr3mg)
+"Rohde Schwarz - YouTube"
+[[https://www.youtube.com/channel/UCoJfm2BU72j699FH3IUr3mg]]
 "Understanding Error Vector Magnitude (EVM) - YouTube" (https://www.youtube.com/watch?v=rMVAQsUudSs)
 "Interpreting Constellation Diagrams - YouTube" (https://www.youtube.com/watch?v=aQd_zBytid8)
