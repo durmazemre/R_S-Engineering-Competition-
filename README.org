@@ -15,5 +15,9 @@ in the program itself:
 * resources
 "Rohde Schwarz - YouTube"
 [[https://www.youtube.com/channel/UCoJfm2BU72j699FH3IUr3mg]]
-"Understanding Error Vector Magnitude (EVM) - YouTube" (https://www.youtube.com/watch?v=rMVAQsUudSs)
-"Interpreting Constellation Diagrams - YouTube" (https://www.youtube.com/watch?v=aQd_zBytid8)
+
+"Understanding Error Vector Magnitude (EVM) - YouTube"
+[[https://www.youtube.com/watch?v=rMVAQsUudSs]]
+
+"Interpreting Constellation Diagrams - YouTube"
+[[https://www.youtube.com/watch?v=aQd_zBytid8]]
