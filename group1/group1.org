@@ -4,6 +4,7 @@ use
 
 consider doing sampling with interpolation when nos is not an integer
 [[https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html#scipy.interpolate.interp1d]]
+[[https://docs.scipy.org/doc/scipy/reference/interpolate.html]]
 
 In addition, consider finding phase independently for both I and Q channels? That might explain why you see so much noise
 
