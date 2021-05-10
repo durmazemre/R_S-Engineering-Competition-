@@ -3,8 +3,6 @@
 - figure out symbol rate
 - matched filtering
 - sample
-  
-https://pypi.org/project/scikit-commpy/
 ** group2: chris, emre
 figure out modulation type and order by looking at this scatter plot
 

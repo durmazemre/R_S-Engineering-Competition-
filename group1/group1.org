@@ -1,0 +1,68 @@
+* TODO
+use
+[[https://pypi.org/project/scikit-commpy/]]
+
+consider doing sampling with interpolation when nos is not an integer
+[[https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html#scipy.interpolate.interp1d]]
+
+In addition, consider finding phase independently for both I and Q channels? That might explain why you see so much noise
+
+* public signals info
+   Symbol Rate (MHz) Modulation Type Modulation Order
+0                  5             PSK             BPSK
+1              21.26             PSK             QPSK
+2                 25             QAM            QAM16
+3              13.11             QAM            QAM32
+4              30.73             QAM            QAM64
+5               None             PSK             BPSK
+6               None            None             None
+7               None            None             None
+8               None             PSK             QPSK
+9                  5             PSK             BPSK
+10              None            None             None
+11              None             PSK             QPSK
+12             12.05             QAM            QAM64
+13              None            None             None
+14              None            None             None
+15              None            None             None
+16              1.52             QAM            QAM16
+17              None            None             None
+18              None             PSK             QPSK
+
+* additional info
+nos: oversampling factor
+phases: phase (in samples) needed for correct sampling
+
+Signal 0
+nos: 20
+phase: 13
+
+Signal 1
+nos: 4.703668861712136
+phase: 5 (or probably/maybe 0 as well)
+
+Signal 2
+nos: 4
+phase: 3 (or probably 2 as well)
+
+Signal 3
+nos: 7.627765064836003
+phase: 4 or 5 look good. Though interestingly 12 looks best.
+TODO maybe this suggests that I should look for much larger phases?
+Or PERHAPS that I need to do some sort of interpolation?
+
+Signal 4
+nos: 3.254149040026033
+phase: 3 (or probably/maybe 2 as well)
+
+Signal 9
+nos: 20
+phase: 13 (or MAYBE 14 as well)
+
+Signal 12
+nos: 8.298755186721992
+phase: 4 (or very probably 5 as well)
+
+Signal 16
+nos: 65.78947368421052
+phase: 29
