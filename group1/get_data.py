@@ -6,19 +6,21 @@ SIGNALS_DIR = "../Public_Data/"
 input_data, data_characteristics = io.inventory_data(SIGNALS_DIR, verbose=True)
 SAMPLING_RATE = 100e6
 ROLL_OFF = 0.22
-SIG_INDEX = 2
+SIG_INDEX = 0
 
 sig = input_data[SIG_INDEX] # signal
 symbol_rate = 1e6*data_characteristics["Symbol Rate (MHz)"][SIG_INDEX]
 Ts = 1/symbol_rate # symbol period
-nos = int(SAMPLING_RATE/symbol_rate) # oversampling factor
+nos = SAMPLING_RATE/symbol_rate # oversampling factor
 
 # IQ signals
-LEN = nos*50
-sigI = sig[1:LEN:2]
-sigQ = sig[2:LEN:2]
-plt.plot(sigI, 'r')
-plt.plot(sigQ, 'b')
+LEN = int(nos*100)
+# START_ODD = 2*(nos*5//2) + 1
+START_ODD = 1
+sigI = sig[START_ODD:LEN:2]
+sigQ = sig[START_ODD + 1:LEN:2]
+plt.plot(sigI, color='red', marker='+', ls='-')
+plt.plot(sigQ, color='blue', marker='+', ls='-')
 plt.show()
 
 # generate RRC pulse
@@ -31,13 +33,29 @@ rrc_sig, times = get_rrc_pulse(symbol_rate=symbol_rate)
 # matched filtering
 mf_sigI = np.convolve(sigI, rrc_sig, 'same')
 mf_sigQ = np.convolve(sigQ, rrc_sig, 'same')
-plt.plot(sigI, 'orange')
-plt.plot(mf_sigI, 'red')
-plt.plot(sigQ, 'cyan')
-plt.plot(mf_sigQ, 'blue')
+plt.plot(sigI, color='red')
+plt.plot(mf_sigI, color='orange')
+plt.plot(sigQ, color='blue')
+plt.plot(mf_sigQ, color='cyan')
 plt.show()
 
 # sampling
+for PHASE in range(min(int(nos), 5)):
+    GAP = nos
+    # PHASE = 0
+    sample_times = [round(i*GAP) for i in range(PHASE, int(len(mf_sigI)//GAP))]
+    xdata = mf_sigI[sample_times]
+    ydata = mf_sigQ[sample_times]
+    plt.plot(mf_sigI, color='orange')
+    plt.scatter(sample_times, xdata, c='orange')
+    plt.plot(mf_sigQ, color='cyan')
+    plt.scatter(sample_times, ydata, c='cyan')
+    plt.show()
+
+    plt.scatter(xdata, ydata)
+    plt.show()
+
+
 # TODO
 
 
