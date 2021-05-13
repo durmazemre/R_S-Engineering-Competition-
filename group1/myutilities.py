@@ -61,26 +61,26 @@ def sampling2(mf_sigI, mf_sigQ, Ts, nos):
         plt.show()
 
 
-def test():
-    rc_sig = np.convolve(rrc_sig, rrc_sig, 'same')
-    plt.plot(rc_sig, 'greenyellow')
-    #plt.plot(times*symbol_rate, rc_sig, 'greenyellow')
-    plt.show()
-    pulse = [rc_sig/20, rrc_sig][2]
-    color = ['gray', 'black'][2]
-    msg = [1, 1, 1, -1, 1, -1, 1, -1]
-    nos = int(Ts*sampling_rate) # oversampling factor
-    pulse_msg = np.zeros((len(msg) - 1)*nos+len(pulse), 'float32')
-    for i in range(len(msg)):
-        pulse_msg[i*nos:i*nos+len(pulse)] += msg[i]*pulse
-        plt.plot(pulse_msg, color)
-        plt.show()
-        ###########
-    s_rate = 100e6
-    s_period = 1/s_rate
-    # rrc_sig[times[len(times)//2]]
-    sum_rrc_sig = sum(rrc_sig**2)
-    print((s_period*sum_rrc_sig))
-    len(rrc_sig)
+# def test():
+#     rc_sig = np.convolve(rrc_sig, rrc_sig, 'same')
+#     plt.plot(rc_sig, 'greenyellow')
+#     #plt.plot(times*symbol_rate, rc_sig, 'greenyellow')
+#     plt.show()
+#     pulse = [rc_sig/20, rrc_sig][2]
+#     color = ['gray', 'black'][2]
+#     msg = [1, 1, 1, -1, 1, -1, 1, -1]
+#     nos = int(Ts*sampling_rate) # oversampling factor
+#     pulse_msg = np.zeros((len(msg) - 1)*nos+len(pulse), 'float32')
+#     for i in range(len(msg)):
+#         pulse_msg[i*nos:i*nos+len(pulse)] += msg[i]*pulse
+#         plt.plot(pulse_msg, color)
+#         plt.show()
+#         ###########
+#     s_rate = 100e6
+#     s_period = 1/s_rate
+#     # rrc_sig[times[len(times)//2]]
+#     sum_rrc_sig = sum(rrc_sig**2)
+#     print((s_period*sum_rrc_sig))
+#     len(rrc_sig)
 
 

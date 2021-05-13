@@ -75,7 +75,7 @@ phase: 29
 0                  5          BPSK
 1              21.26          QPSK
 2                 25         QAM16
-3              13.11         QAM32
+3              13.11         32QAM
 4              30.73         QAM64
 *5               7.79         BPSK
 *6              15.66        32QAM
