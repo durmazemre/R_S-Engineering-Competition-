@@ -6,8 +6,8 @@ import get_samples
 
 
 SIG_INDEX = 0
-length=50000
-throw_out_fraction=0.3
+length = 50000 # make sure this is even; max value is 400000
+throw_out_fraction = 0.3 # should be between 0 and 1
 I_results, Q_results = get_samples.main_function(SIG_INDEX, length, throw_out_fraction)
 plt.scatter(I_results, Q_results)
 plt.show()
