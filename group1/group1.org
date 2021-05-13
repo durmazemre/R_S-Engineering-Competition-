@@ -1,13 +1,6 @@
-* TODO
-use
-[[https://pypi.org/project/scikit-commpy/]]
-
-consider doing sampling with interpolation when nos is not an integer
-[[https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html#scipy.interpolate.interp1d]]
-[[https://docs.scipy.org/doc/scipy/reference/interpolate.html]]
-
-In addition, consider finding phase independently for both I and Q channels? That might explain why you see so much noise
-
+* resources
+QAM constellation shapes
+https://www.electronics-notes.com/articles/radio/modulation/quadrature-amplitude-modulation-types-8qam-16qam-32qam-64qam-128qam-256qam.php
 * public signals info
    Symbol Rate (MHz) Modulation Type Modulation Order
 0                  5             PSK             BPSK
@@ -36,7 +29,18 @@ phases: phase (in samples) needed for correct sampling
 
 Signal 0
 nos: 20
-phase: 13
+phase: 10
+
+Signal 1
+nos: 4.703668861712136
+phase: 5.5 (or probably 1 as well)
+
+Signal 2
+nos: 4
+phase: 3
+
+* OLD additional info
+[2021-05-12 Wed] Update: I wasn't separating sigI and sigQ correctly so the below phase values are probably incorrect now.
 
 Signal 1
 nos: 4.703668861712136
@@ -67,3 +71,31 @@ phase: 4 (or very probably 5 as well)
 Signal 16
 nos: 65.78947368421052
 phase: 29
+* missing parameters
+0                  5             PSK             BPSK
+1              21.26             PSK             QPSK
+2                 25             QAM            QAM16
+3              13.11             QAM            QAM32
+4              30.73             QAM            QAM64
+*5               7.79            PSK             BPSK
+*6              15.66            None           32QAM
+
+*7              15.75            None           16QAM
+*8               8.23             PSK            QPSK
+9                   5             PSK            BPSK
+*10              20.0            None           64QAM
+
+*11             17.82             PSK            QPSK
+12              12.05             QAM            QAM64
+*13              33.2            None            32QAM
+*14               5.0            None            BPSK
+
+***15             5.0            None            BPSK
+16               1.52             QAM           QAM16
+?***17           31.99            None            None
+?***18           18.32            PSK            QPSK
+
+17 --> maybe 10 MHz?
+18 --> maybe 9.2 MHz?
+
+
