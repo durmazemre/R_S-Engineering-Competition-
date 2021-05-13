@@ -1,4 +1,6 @@
 import sys
+import matplotlib.pyplot as plt
+
 sys.path.append(os.path.abspath("../group1/"))
 import get_samples
 
