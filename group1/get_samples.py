@@ -186,7 +186,7 @@ def main_function(SIG_INDEX, length=50000, throw_out_fraction=0.3):
     return I_results, Q_results
 
 if __name__ == '__main__':
-    SIG_INDEX = 15
+    SIG_INDEX = 0
     I_results, Q_results = main_function(SIG_INDEX)
     plt.scatter(I_results, Q_results)
     plt.show()
