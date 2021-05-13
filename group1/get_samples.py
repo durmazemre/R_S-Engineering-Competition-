@@ -140,7 +140,7 @@ def matched_filtering(sig, symbol_rate, length):
     nos = SAMPLING_RATE/symbol_rate # oversampling factor
 
     # IQ signals
-    FULL_LEN = length
+    FULL_LEN = length*2
     sigI = sig[0:FULL_LEN:2]
     sigQ = sig[1:FULL_LEN+1:2]
     LEN = len(sigI)
@@ -173,7 +173,7 @@ def get_symbol_rate(SIG_INDEX, data_characteristics):
     return symbol_rate
 
 
-def main_function(SIG_INDEX, length=50000, throw_out_fraction=0.3):
+def main_function(SIG_INDEX, length=2500, throw_out_fraction=0.3):
     print("SIG_INDEX: ", SIG_INDEX)
     input_data, data_characteristics = io.inventory_data(SIGNALS_DIR, verbose=True)
     print("Length we are using: ", length)
