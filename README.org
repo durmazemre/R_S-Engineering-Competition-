@@ -22,11 +22,14 @@ figure out modulation type and order by looking at this scatter plot
 [[https://en.wikipedia.org/wiki/Determining_the_number_of_clusters_in_a_data_set]]
  
 google: determine k in k means clustering
-https://www.kdnuggets.com/2019/08/introduction-image-segmentation-k-means-clustering.html
+[[https://www.kdnuggets.com/2019/08/introduction-image-segmentation-k-means-clustering.html]]
 *** chris
 **** neural network
 convert samples to a density gradient grayscale image
-https://stackoverflow.com/questions/20105364/how-can-i-make-a-scatter-plot-colored-by-density-in-matplotlib
+
+[[https://stackoverflow.com/questions/20105364/how-can-i-make-a-scatter-plot-colored-by-density-in-matplotlib]]
+
+https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap-with-matplotlib
 * resources
 - "Rohde Schwarz - YouTube" [[https://www.youtube.com/channel/UCoJfm2BU72j699FH3IUr3mg]]
 - "Understanding Error Vector Magnitude (EVM) - YouTube" [[https://www.youtube.com/watch?v=rMVAQsUudSs]]
