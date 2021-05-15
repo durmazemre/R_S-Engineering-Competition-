@@ -29,7 +29,7 @@ convert samples to a density gradient grayscale image
 
 [[https://stackoverflow.com/questions/20105364/how-can-i-make-a-scatter-plot-colored-by-density-in-matplotlib]]
 
-https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap-with-matplotlib
+[[https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap-with-matplotlib]]
 * resources
 - "Rohde Schwarz - YouTube" [[https://www.youtube.com/channel/UCoJfm2BU72j699FH3IUr3mg]]
 - "Understanding Error Vector Magnitude (EVM) - YouTube" [[https://www.youtube.com/watch?v=rMVAQsUudSs]]
