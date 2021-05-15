@@ -5,23 +5,28 @@
 - sample
 ** group2: chris, emre
 figure out modulation type and order by looking at this scatter plot
-
 *** considerations:
 - can use ML or classical methods (using probability models)
 - in the program itself:
   - use probabilities
   - maybe have it so that it can take work with a portion of the data and later efficiently incorporate more data if it is needed
-*** k-means
-generate synthetic data
+*** emre
+**** complete group2/synthetic_data.py
+**** investigate which intializiations of k-means works best
+- do initialization with points circularly arranged? or just normal constellations; make sure to plot it on the scatter plot before sending it thorugh k-means
 
- [[https://docs.scipy.org/doc/scipy/reference/cluster.vq.html]]
+- after getting the centroids from k-means, plot it on the scatter plot
+**** k-means
+[[https://docs.scipy.org/doc/scipy/reference/cluster.vq.html]]
  
- [[https://en.wikipedia.org/wiki/Determining_the_number_of_clusters_in_a_data_set]]
+[[https://en.wikipedia.org/wiki/Determining_the_number_of_clusters_in_a_data_set]]
  
- google: determine k in k means clustering
-**** more links
- https://www.kdnuggets.com/2019/08/introduction-image-segmentation-k-means-clustering.html
-      
+google: determine k in k means clustering
+https://www.kdnuggets.com/2019/08/introduction-image-segmentation-k-means-clustering.html
+*** chris
+**** neural network
+convert samples to a density gradient grayscale image
+https://stackoverflow.com/questions/20105364/how-can-i-make-a-scatter-plot-colored-by-density-in-matplotlib
 * resources
 - "Rohde Schwarz - YouTube" [[https://www.youtube.com/channel/UCoJfm2BU72j699FH3IUr3mg]]
 - "Understanding Error Vector Magnitude (EVM) - YouTube" [[https://www.youtube.com/watch?v=rMVAQsUudSs]]
