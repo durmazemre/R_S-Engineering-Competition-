@@ -2,17 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
 from scipy import interpolate
+from scipy.cluster.vq import kmeans
 import sys
 
 SAMPLING_RATE = 100e6 # TODO this is also in the myutilities.py file
 ROLL_OFF = 0.22
 
-if __name__ == '__main__':
-    import data_io_ingestion as io
-    SIG_INDEX = 0
-    sig = input_data[SIG_INDEX]
-    symbol_rate, modulation_type, modulation_order = student_magic(sig)
-    print(symbol_rate, modulation_type, modulation_order)
 
 def student_magic(input_signal):
     '''
@@ -20,12 +15,16 @@ def student_magic(input_signal):
     :return: symbol_rate,modulation_type, modulation_order
     '''
     symbol_rate = symbol_rate_detection(input_signal)
-    I_results, Q_results = get_samples.get_samples(input_signal)
-    # plt.scatter(I_results, Q_results)
-    # plt.show()
+    symbol_rate = int(symbol_rate)
+    I_results, Q_results = get_samples(input_signal)
 
+    plt.scatter(I_results, Q_results)
+    plt.show()
 
-    symbol_rate, modulation_type, modulation_order = 0, "", ""
+    modulation_type = detect_mod_type(I_results, Q_results)
+
+    modulation_order, modulation_type = detect_mod_order(I_results, Q_results, modulation_type)
+
 
     # symbol_rate in Hz.
 	# modulation_type: "PSK" / "QAM"
@@ -231,7 +230,7 @@ def get_samples(sig, throw_out_fraction=0.3):
     symbol_rate = symbol_rate_detection(sig)
     # return
 
-    length = int(min(len(sig), 200e3)//2)
+    length = int(min(len(sig), 250e3)//2)
     # IQ signals
     sigI = sig[0:length*2:2]
     sigQ = sig[1:length*2:2]
@@ -262,6 +261,65 @@ def rrc(times, Ts, nos, rolloff):
     # TODO specify count parameter as well for more efficiency
     return np.fromiter(iter_obj, 'float32')
 
+def detect_mod_type(real_sym,imag_sym):
+    sym = real_sym + 1j * imag_sym
+    power = np.sqrt(sym * np.conjugate(sym))
+    ratio = np.amax(power) / np.amin(power)
+
+    if ratio < 3:
+        est_mod_type = "PSK"
+    elif ratio > 3 and ratio < 7:
+        est_mod_type = "Not_known"
+    else:
+        est_mod_type = "QAM"
+
+    return  est_mod_type
+
+
+
+def detect_mod_order(real_sym,imag_sym, est_mod_type):
+    data_mtx = np.concatenate((np.array(real_sym, ndmin=2).T, np.array(imag_sym, ndmin=2).T), axis=1)
+
+    if est_mod_type == "QAM":
+        possible_orders = [64, 32, 16, 4, 2]
+    elif est_mod_type == "PSK":
+        possible_orders = [4,2]
+    else:
+        possible_orders = [32, 16, 4, 2]
+    distortion_cont = np.array([])
+
+    for i in possible_orders:
+        centers_mtx, distortion = kmeans(data_mtx, i)
+        distortion_cont = np.append(distortion_cont, distortion)
+
+    distortion_cont2 = np.roll(distortion_cont, len(possible_orders) - 1)
+    distortion_cont2[-1] = 0
+    differences = np.absolute((distortion_cont - distortion_cont2) / distortion_cont)
+    ind = np.argmax(differences)
+    est_mod_ind = possible_orders[ind]
+
+    if est_mod_ind == 2:
+        mod_ind = "BPSK"
+    elif est_mod_ind == 4:
+        mod_ind = "QPSK"
+    elif est_mod_ind == 16:
+        mod_ind = "QAM16"
+    elif est_mod_ind == 32:
+        mod_ind = "QAM32"
+    elif est_mod_ind == 64:
+        mod_ind = "QAM64"
+    else:
+        raise Exception("Error in code1")
+
+
+    if est_mod_ind < 16:
+        est_mod_type = "PSK"
+    else:
+        est_mod_type = "QAM"
+
+
+    return mod_ind, est_mod_type
+
 
 def rrc_impulse(t, Ts, rolloff):
     if t == 0:
@@ -276,3 +334,15 @@ def rrc_impulse(t, Ts, rolloff):
         denom = (1-(4*rolloff*t/Ts)**2)*np.pi*t/Ts
         return (1/Ts)*(first_term + second_term)/denom
 
+
+
+if __name__ == '__main__':
+    import data_io_ingestion as io
+
+    SIGNALS_DIR = "../Public_Data/"
+
+    input_data, data_characteristics = io.inventory_data(SIGNALS_DIR, verbose=True)
+    SIG_INDEX = 6
+    sig = input_data[SIG_INDEX]
+    symbol_rate, modulation_type, modulation_order = student_magic(sig)
+    print(symbol_rate, modulation_type, modulation_order)

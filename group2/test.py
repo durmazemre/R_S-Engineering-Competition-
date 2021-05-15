@@ -1,16 +1,32 @@
+import os
 import sys
 import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath("../group1/"))
 import get_samples
+import functions
 
 
-SIG_INDEX = 0
-length = 25000 # max value is 200000
+SIG_INDEX = 12
+length = 100000 # max value is 200000
 throw_out_fraction = 0.3 # should be between 0 and 1
 I_results, Q_results = get_samples.main_function(SIG_INDEX, length, throw_out_fraction)
 plt.scatter(I_results, Q_results)
 plt.show()
+
+print("Part1 over")
+
+est_mod_type = functions.detect_mod_type(I_results, Q_results)
+
+#est_mod_type = "Not_known"
+print(est_mod_type)
+
+centers_mtx, est_mod_order, est_mod_type = functions.detect_mod_order(I_results, Q_results, est_mod_type)
+
+#print(est_mod_order)
+#print(est_mod_type)
+
+
 
 
 
