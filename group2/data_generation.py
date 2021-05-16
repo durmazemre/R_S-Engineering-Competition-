@@ -90,7 +90,7 @@ if __name__ == "__main__":
     tr_sym = transmitter(mod_ord, num_samples, modulation, plot_const_diag, sig_pwr)
     rec_sym = channel(SNR_dB, sig_pwr, tr_sym, rotation)
 
-    check = np.mean(np.abs(tr_sym) ** 2)
-    check2 = np.mean(np.abs(rec_sym) ** 2)
+    tr_pow = np.mean(np.abs(tr_sym) ** 2)
+    rec_pow = np.mean(np.abs(rec_sym) ** 2)
 
     plot_const(rec_sym)
