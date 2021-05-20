@@ -42,7 +42,7 @@ def symbol_rate_detection(sig):
     sigQ = sig[1:tmp_length*2:2]
 
     sigCmplx = sigI + 1j*sigQ
-    if True: # plot original spectrum # and perhaps modify original signal
+    if False: # plot original spectrum # and perhaps modify original signal
         freqs, ft_sigCmplx0 = signal.periodogram(sigCmplx, SAMPLING_RATE)
         freqs_MHz = freqs/1e6
         plt.plot(freqs, (ft_sigCmplx0), 'r') # np.log?
@@ -63,7 +63,7 @@ def symbol_rate_detection(sig):
     freqs, ft_sigCmplx = signal.periodogram(sigCmplx, SAMPLING_RATE)
     freqs_MHz = freqs/1e6
 
-    if True: # plot new spectrum
+    if False: # plot new spectrum
         freqs, ft_sigCmplx = signal.periodogram(sigCmplx, SAMPLING_RATE)
         freqs_MHz = freqs/1e6
         plt.plot(freqs, (ft_sigCmplx), 'r') # np.log?
@@ -229,7 +229,7 @@ if __name__ == '__main__':
     # filtering(None)
     if False:
         symbol_rate = symbol_rate_detection(sig)
-    if True:
+    if False:
         symbol_rate = get_symbol_rate(SIG_INDEX, set_two=set_two)
         print("symbol_rate", symbol_rate/1e6, " MHz")
         # length = int(min(len(sig), 100e3)//2)
