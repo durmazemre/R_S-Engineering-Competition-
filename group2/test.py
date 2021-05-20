@@ -1,3 +1,4 @@
+import data_io_ingestion as io
 import os
 import sys
 import matplotlib.pyplot as plt
@@ -6,14 +7,21 @@ sys.path.append(os.path.abspath("../group1/"))
 import get_samples
 import functions
 
-
+# GET SIGNAL
+SIGNALS_DIR = "../Public_Data/"
+input_data, data_characteristics = io.inventory_data(SIGNALS_DIR, verbose=True)
 SIG_INDEX = 12
-length = 100000 # max value is 200000
+sig = input_data[SIG_INDEX] # signal
+
+# SAMPLING
+length = int(min(len(sig), 200e3)//2) # max value is 200000 i.e 400000//2
 throw_out_fraction = 0.3 # should be between 0 and 1
-I_results, Q_results = get_samples.main_function(SIG_INDEX, length, throw_out_fraction)
+I_results, Q_results = get_samples.get_samples(sig, length, throw_out_fraction)
 plt.scatter(I_results, Q_results)
 plt.show()
 
+# REST
+sys.exit(0)
 print("Part1 over")
 
 est_mod_type = functions.detect_mod_type(I_results, Q_results)
