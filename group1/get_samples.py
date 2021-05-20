@@ -229,18 +229,38 @@ def get_samples(sig, length, throw_out_fraction=0.3):
     return I_results, Q_results
 
 if __name__ == '__main__':
-    input_data = io.get_set_two()
+    input_data = io.get_set_two(cnstln=True)
+    for x in range(0,5):
+        print(input_data[x])
+        print(len(input_data[x]))
+
     # print("Length we are using: ", length)
-    for i in range(0, len(input_data)):
-        SIG_INDEX = i
+    # for i in range(0, len(input_data)):
+    if False:
+        SIG_INDEX = 0
         print("SIG_INDEX: ", SIG_INDEX)
         sig = input_data[SIG_INDEX] # signal
-        print(len(sig)/1e3, "thousand samples")
-        # length = int(min(len(sig), 100e3)//2)
-        # length = len(sig)//2
         # get_samples(sig, length)
+
+        symbol_rate = symbol_rate_detection(sig)
+        # length = int(min(len(sig), 100e3)//2)
+        length = int(min(len(sig), 1000)//2)
+        # IQ signals
+        sigI = sig[0:length*2:2]
+        sigQ = sig[1:length*2:2]
+        mf_sigI, mf_sigQ, Ts, nos = matched_filtering(sigI, sigQ, symbol_rate, length)
+        plt.plot(sigI, color='red')
+        plt.plot(mf_sigI, color='orange')
+        plt.plot(sigQ, color='blue')
+        plt.plot(mf_sigQ, color='cyan')
+        plt.show()
+
+        print("Ts", Ts, "nos", nos)
+        # I_results, Q_results = sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction)
+
         # I_results, Q_results = get_samples(sig, length)
         # plt.scatter(I_results, Q_results)
         # plt.show()
+
 
 
