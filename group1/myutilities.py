@@ -1,9 +1,40 @@
+import os
+import sys
 import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
+sys.path.append(os.path.abspath("../common/"))
+import data_io_ingestion as io
 
 SAMPLING_RATE = 100e6
 ROLL_OFF = 0.22
+SYNC = "010001000100001011101011111111001110100000111110110101011000000001101111010111010101001011111111111001111111101011010110"
+SAMPLES_DIR = '../Public Finals Samples/'
+
+def save_file(samplesI, samplesQ, filename):
+    samples = samplesI + 1j*samplesQ
+    path = SAMPLES_DIR + filename + '.npy'
+    with open(path, 'wb') as f:
+        np.save(f, samples)
+
+def get_sync(M): # M is modulation order
+    # return SYNC sequence in form of modulation symbols
+    sync = np.fromstring(SYNC,'u1') - ord('0')
+    bit_count = int(np.log2(M))
+    input_data = io.get_set_two(cnstln=True)
+    d = {2: 0, 4: 4, 16:1, 32:2, 64:3} # dictionary: M -> input_data index array
+    k = d[M]
+    cnstln = input_data[k]
+    cnstln_r = cnstln[0::2]
+    cnstln_i = cnstln[1::2]
+    symbols = []
+    for i in range(len(SYNC)//bit_count):
+        tmp = sync[i*bit_count:(i+1)*bit_count]
+        index = tmp.dot(2**np.arange(tmp.size)[::-1])
+        cmplx = cnstln_r[index] + 1j*cnstln_i[index]
+        symbols.append(cmplx)
+    return symbols
+
 
 def plotpsd(sigCmplx, details=True):
     freqs, ft_sigCmplx = signal.periodogram(sigCmplx, SAMPLING_RATE)
@@ -29,6 +60,13 @@ def largest_indices(ary, n):
     indices = np.argpartition(flat, -n)[-n:]
     indices = indices[np.argsort(-flat[indices])]
     return np.unravel_index(indices, ary.shape)
+
+def get_rrc_sequence(samples, symbol_rate, rolloff=ROLL_OFF, filterspan=20, sampling_rate=SAMPLING_RATE):
+    pulse = get_rrc_pulse(symbol_rate, rolloff, filterspan, sampling_rate)
+    nos = sampling_rate/symbol_rate
+    Ts = 1/symbol_rate
+    for s in samples:
+        s*pulse
 
 def get_rrc_pulse(symbol_rate, rolloff=ROLL_OFF, filterspan=20, sampling_rate=SAMPLING_RATE):
     nos = sampling_rate/symbol_rate

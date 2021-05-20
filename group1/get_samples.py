@@ -6,6 +6,8 @@ from scipy import interpolate
 import sys
 from myutilities import get_rrc_pulse
 from myutilities import plotpsd
+from myutilities import get_sync
+import myutilities
 
 sys.path.append(os.path.abspath("../common/"))
 import data_io_ingestion as io
@@ -85,20 +87,37 @@ def sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction):
     ######
     # INIT
     ######
-    # START = 2 # we will only sample in range [START, end-START]
     START = 4 # we will only sample in range [START, end-START]
+
     LEN = len(mf_sigI)
     SAMPLES_COUNT = int(LEN/nos) - 2*START # TODO
     I_samples = np.empty(SAMPLES_COUNT)
     Q_samples = np.empty(SAMPLES_COUNT)
     sample_times = np.empty(SAMPLES_COUNT)
-    interp_mf_sigI = interpolate.interp1d(range(LEN), mf_sigI)
-    interp_mf_sigQ = interpolate.interp1d(range(LEN), mf_sigQ)
+    upsample_factor = max(np.ceil(30/nos), nos)
+    def upsample(mf_sigI, mf_sigQ):
+        interp_mf_sigI = interpolate.interp1d(range(LEN), mf_sigI)
+        interp_mf_sigQ = interpolate.interp1d(range(LEN), mf_sigQ)
+        up_times = np.arange(0, LEN - 1, 1/upsample_factor)
+        print(up_times, LEN)
+        up_mf_sigI = interp_mf_sigI(up_times)
+        up_mf_sigQ = interp_mf_sigQ(up_times)
+        return up_mf_sigI, up_mf_sigQ
+
+    up_mf_sigI, up_mf_sigQ = upsample(mf_sigI, mf_sigQ)
     def sampler(i, offset):
-        center = (START+i+offset)*nos
-        sample_times[i] = center
-        I_samples[i] = interp_mf_sigI(center)
-        Q_samples[i] = interp_mf_sigQ(center)
+        if False: # interpolate version
+            center = (START+i+offset)*nos
+            sample_times[i] = center
+            I_samples[i] = interp_mf_sigI(center)
+            Q_samples[i] = interp_mf_sigQ(center)
+        else: # upsample version
+            center = (START+i+offset)*nos*upsample_factor
+            sample_times[i] = center
+            nearest = int(round(center))
+            I_samples[i] = up_mf_sigI[nearest]
+            Q_samples[i] = up_mf_sigQ[nearest]
+
     def error_detector(i, offset):
         SHIFT = max(nos/2, 1)
         if False: # early late
@@ -107,12 +126,22 @@ def sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction):
             second_term = interp_mf_sigQ(center + SHIFT) - interp_mf_sigQ(center - SHIFT)
             return (first_term + second_term)/2
         else: # Gardner
-            center = (START+i+offset)*nos
-            first_term = interp_mf_sigI(center + SHIFT) - interp_mf_sigI(center - SHIFT)
-            first_term *= I_samples[i] # TODO normalize somehow?
-            second_term = interp_mf_sigQ(center + SHIFT) - interp_mf_sigQ(center - SHIFT)
-            second_term *= Q_samples[i] # TODO normalize somehow?
-            return first_term + second_term
+            if False: # inteperpolate version
+                center = (START+i+offset)*nos*upsample_factor
+                first_term = interp_mf_sigI(center + SHIFT) - interp_mf_sigI(center - SHIFT)
+                first_term *= I_samples[i] # TODO normalize somehow?
+                second_term = interp_mf_sigQ(center + SHIFT) - interp_mf_sigQ(center - SHIFT)
+                second_term *= Q_samples[i] # TODO normalize somehow?
+                return first_term + second_term
+            else: # upsample version
+                center = (START+i+offset)*nos*upsample_factor
+                nearest_plus = int(round(center + SHIFT))
+                nearest_minus = int(round(center - SHIFT))
+                first_term = up_mf_sigI[nearest_plus] - up_mf_sigI[nearest_minus]
+                first_term *= I_samples[i] # TODO normalize somehow?
+                second_term = up_mf_sigQ[nearest_plus] - up_mf_sigQ[nearest_minus]
+                second_term *= Q_samples[i] # TODO normalize somehow?
+                return first_term + second_term
     def loop_filter(disc):
         if not hasattr(loop_filter, "I"):
             loop_filter.I = 0
@@ -130,18 +159,19 @@ def sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction):
     ###############
     offset_array = np.empty(SAMPLES_COUNT) # DEBUG
     offset = 0.5 # initialize
+    offset = 0.5855 # TODO TODO TODO
     for i in range(SAMPLES_COUNT):
-        try:
-            sampler(i, offset)
-            disc = error_detector(i, offset)
-        except ValueError as e: # TODO
-            print(e)
-            SAMPLES_COUNT = i
-            break
+        # try:
+        sampler(i, offset)
+        disc = error_detector(i, offset)
+        # except ValueError as e: # TODO
+        #     print(e)
+        #     SAMPLES_COUNT = i
+        #     break
         error = loop_filter(disc)
         offset += error
         offset_array[i] = offset # DEBUG
-        if i % 10 == 0:
+        if i % 6000 == 0:
             print("offset: ", offset)
         # print("filter.I", loop_filter.I, "error", error)
 
@@ -215,7 +245,7 @@ def get_samples(sig, length, throw_out_fraction=0.3):
 if __name__ == '__main__':
     # I_results, Q_results = get_samples(sig, length)
     set_two = True
-    SIG_INDEX = 3
+    SIG_INDEX = 0
     print("SIG_INDEX: ", SIG_INDEX)
     if set_two:
         input_data = io.get_set_two()
@@ -225,18 +255,19 @@ if __name__ == '__main__':
     #     print(input_data[x])
     #     print(len(input_data[x]))
     sig = input_data[SIG_INDEX] # signal
-    print("full length", len(sig)//2)
+    print("full length (as IQ pairs)", len(sig)//2)
 
     # print("Length we are using: ", length)
     # for i in range(0, len(input_data)):
     # filtering(None)
     if False:
         symbol_rate = symbol_rate_detection(sig)
-    if True:
+    if False:
         symbol_rate = get_symbol_rate(SIG_INDEX, set_two=set_two)
         print("symbol_rate", symbol_rate/1e6, " MHz")
         # length = int(min(len(sig), 100e3)//2)
-        length = int(min(len(sig), 20e3)//2)
+        # length = int(min(len(sig), 200e3)//2)
+        length = len(sig)
 
         # IQ signals
         sigI = sig[0:length*2:2]
@@ -256,8 +287,11 @@ if __name__ == '__main__':
                 plt.show()
 
         print("Ts", Ts, "nos", nos, "symbol_rate", symbol_rate/1e6, " MHz")
-        I_results, Q_results = sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction=0.5)
+        I_results, Q_results = sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction=0.0)
         plt.scatter(I_results, Q_results)
         plt.show()
+        print("number of samples saved: ", len(I_results))
+        myutilities.save_file(I_results, Q_results, "sig0")
+
 
 

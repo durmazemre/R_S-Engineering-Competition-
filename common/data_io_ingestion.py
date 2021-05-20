@@ -14,6 +14,7 @@ from contextlib import closing
 
 SIGNALS_DIR = "../Public_Data/"
 SIGNALS2_DIR = "../Public Data Finals Signals/"
+SAMPLES_DIR = '../Public Finals Samples/'
 
 
 if (os.name == "nt"):
@@ -91,6 +92,15 @@ def get_set_two(verbose=False, cnstln=False):
             return i[:5]
        else:
             return i[5:]
+
+# example call:
+#         I_results, Q_results = load_samples('sig0')
+def load_samples(filename)
+    path = SAMPLES_DIR + filename + '.npy'
+    data = np.load(path)
+    I_results = np.real(data)
+    Q_results = np.imag(data)
+    return I_results, Q_results
 
 def get_symbol_rate(SIG_INDEX, set_two=False):
     if not set_two:
