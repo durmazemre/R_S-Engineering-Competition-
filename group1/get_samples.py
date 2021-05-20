@@ -3,53 +3,71 @@ import numpy as np
 from scipy import signal
 from scipy import interpolate
 import sys
+from myutilities import get_rrc_pulse
+from myutilities import plotpsd
+
 sys.path.append(os.path.abspath("../common/"))
 import data_io_ingestion as io
-from myutilities import get_rrc_pulse
+from data_io_ingestion import get_symbol_rate
 #np.set_printoptions(formatter={'float': '{: 0.4f}'.format})
 
 SAMPLING_RATE = 100e6 # TODO this is also in the myutilities.py file
 
-#def symbol_rate_detection(sig, debug_symbol_rate): # NOT COMPLETE
+def lowpass(sig):
+    order = 10
+    Wn = 5e6
+    btype='lowpass'
+    sos = signal.butter(order, Wn, btype, fs=SAMPLING_RATE, output='sos')
+    w, h = signal.sosfreqz(sos, fs=SAMPLING_RATE)
+    plt.plot(w, h)
+    # filtered = signal.sosfilt(sos, sig)
+    filtered = signal.sosfilt(sos, sig)
+    return filtered
+
+def filtering(sig):
+    f_remove = 40e6
+    f_remove = 31.99e6
+    Q=35
+    b, a = signal.iirnotch(f_remove, Q, SAMPLING_RATE)
+    return b, a
+    # freq, h = signal.freqz(b, a, fs=SAMPLING_RATE)
+    # plt.plot(freq, np.log(h))
+    # plt.show()
+    # signal.lfilter(b, a, sig)
+
+
 def symbol_rate_detection(sig):
-    # # DEBUG PREAMBLE
-    # SIG_INDEX = 0
-    # print("SIG_INDEX: ", SIG_INDEX)
-    # input_data, data_characteristics = io.inventory_data(SIGNALS_DIR, verbose=True)
-    # sig = input_data[SIG_INDEX] # signal
-    # debug_symbol_rate = get_symbol_rate(SIG_INDEX, data_characteristics)
-    # print("symbol rate: ", debug_symbol_rate)
-
-    # if False:
-    #     tmp_s_rate = 100 # Hz
-    #     tmp_Ts = 1 # second(s)
-    #     tmp_endtime = tmp_Ts*100
-    #     tmp_times = np.arange(0, tmp_endtime, 1/tmp_s_rate)
-    #     tmp_signal = np.array([np.sin(2*np.pi*x/tmp_Ts) for x in tmp_times]) 
-    #     #plt.plot(tmp_times, tmp_signal)
-    #     #plt.show()
-    #     tmp_ft = np.fft.fft(tmp_signal)
-    #     freqs = np.linspace(0, tmp_s_rate, len(tmp_signal), endpoint=False)
-    #     plt.plot(freqs, np.abs(tmp_ft), 'r')
-    #     plt.plot(freqs, np.angle(tmp_ft), 'b')
-    #     plt.show()
-
     tmp_length = len(sig)//2
     sigI = sig[0:tmp_length*2:2]
     sigQ = sig[1:tmp_length*2:2]
 
-
     sigCmplx = sigI + 1j*sigQ
-    sigCmplx = np.abs(sigCmplx) # TODO
-    # sigCmplx = sigCmplx**2
+    if True: # plot original spectrum # and perhaps modify original signal
+        freqs, ft_sigCmplx0 = signal.periodogram(sigCmplx, SAMPLING_RATE)
+        freqs_MHz = freqs/1e6
+        plt.plot(freqs, (ft_sigCmplx0), 'r') # np.log?
+        plt.show()
+
+        if False: # modifications
+            # b, a = filtering(sigCmplx)
+            sigCmplx = lowpass(sigCmplx)
+            # sigCmplx = signal.lfilter(b, a, sigCmplx)
+            freqs, ft_sigCmplx = signal.periodogram(sigCmplx, SAMPLING_RATE)
+            freqs_MHz = freqs/1e6
+            plt.plot(freqs, (ft_sigCmplx), 'r') # np.log?
+            plt.show()
+            plt.plot(freqs, (ft_sigCmplx - ft_sigCmplx0), 'r') # np.log?
+            plt.show()
+
+    sigCmplx = np.abs(sigCmplx) # OR consider: sigCmplx = sigCmplx**2
     freqs, ft_sigCmplx = signal.periodogram(sigCmplx, SAMPLING_RATE)
-    # negative_indices = np.arange(len(freqs) - 1, len(freqs)//2, -1) # TODO make it more reliable
-    # positive_indices = np.arange(1, len(freqs)//2) # TODO make it more reliable
-    # ft_sigCmplx[positive_indices]
-    # ft_sigCmplx[negative_indices]
-    # ft_sigCmplx = np.fft.fft(sigCmplx)
-    # freqs = np.linspace(0, SAMPLING_RATE, len(sigCmplx), endpoint=False)
     freqs_MHz = freqs/1e6
+
+    if True: # plot new spectrum
+        freqs, ft_sigCmplx = signal.periodogram(sigCmplx, SAMPLING_RATE)
+        freqs_MHz = freqs/1e6
+        plt.plot(freqs, (ft_sigCmplx), 'r') # np.log?
+        plt.show()
 
     print("Results")
     peak_index = np.argmax(ft_sigCmplx)
@@ -58,24 +76,6 @@ def symbol_rate_detection(sig):
     peak2 = ft_sigCmplx[peak2_index]
     print(peak, peak2)
     print(freqs[peak_index]/1e6, freqs[peak2_index]/1e6, " MHz")
-
-    # # nonzero_where = np.where(np.sum(signal_array, axis=0) >= 1)
-    # for peak_fraction in [8, 2]:
-    #     nonzero_where = np.nonzero(ft_sigCmplx > peak/peak_fraction)
-    #     # print(nonzero_where)
-    #     bandwidth_upper = np.max(freqs[nonzero_where])
-    #     bandwidth_lower = np.min(freqs[nonzero_where])
-    #     print("bandwidth", "(1/", peak_fraction, ")", (bandwidth_upper - bandwidth_lower)/1e6, "MHz")
-    #     # print("using Carson formula, R = ", 1e-6*2*(bandwidth_upper - bandwidth_lower)/(1+0.22), "MHz")
-    # plt.axvline(x=bandwidth_upper, color='cyan', linestyle=':')
-    # plt.axvline(x=bandwidth_lower, color='cyan', linestyle=':')
-    # if debug_symbol_rate is not None:
-    #     plt.axvline(x=debug_symbol_rate, color='yellow')
-    # plt.plot(freqs/1e6, np.angle(ft_sigCmplx), 'b')
-
-    plt.plot(freqs, (ft_sigCmplx), 'r') # np.log?
-    plt.show()
-
     result = freqs[peak_index]
     result = round(result/1e4)*1e4
     return int(result)
@@ -184,33 +184,15 @@ def matched_filtering(sigI, sigQ, symbol_rate, length):
     # matched filtering
     mf_sigI = np.convolve(sigI, rrc_sig, 'same') # TODO look into 'same' option
     mf_sigQ = np.convolve(sigQ, rrc_sig, 'same')
-    plt.plot(sigI, color='red')
-    plt.plot(mf_sigI, color='orange')
-    plt.plot(sigQ, color='blue')
-    plt.plot(mf_sigQ, color='cyan')
-    plt.show()
+    # plt.plot(sigI, color='red')
+    # plt.plot(mf_sigI, color='orange')
+    # plt.plot(sigQ, color='blue')
+    # plt.plot(mf_sigQ, color='cyan')
+    # plt.show()
     return mf_sigI, mf_sigQ, Ts, nos
 
 
-# def get_symbol_rate(SIG_INDEX, data_characteristics):
-#     symbol_rate = data_characteristics["Symbol Rate (MHz)"][SIG_INDEX]
-#     if symbol_rate is None:
-#         dictionary = {5:7.79, 6:15.66, 7:15.75, 8:8.23, 9:5, 10:20.0,
-#                       11:17.82, 12:12.05, 13:33.2, 14:5.0, 15:5.0}
-#         symbol_rate = dictionary.get(SIG_INDEX, None)
-#     if symbol_rate is not None:
-#         symbol_rate *= 1e6
-#     return symbol_rate
 
-
-#def get_samples(SIG_INDEX, length=25000, throw_out_fraction=0.3):
-#    print("SIG_INDEX: ", SIG_INDEX)
-#    input_data, data_characteristics = io.inventory_data(SIGNALS_DIR, verbose=True)
-#    print("Length we are using: ", length)
-#    sig = input_data[SIG_INDEX] # signal
-#    symbol_rate = debug_symbol_rate = get_symbol_rate(SIG_INDEX, data_characteristics)
-#    print("symbol rate: ", debug_symbol_rate)
-# def get_samples(sig, length=25000, throw_out_fraction=0.3):
 def get_samples(sig, length, throw_out_fraction=0.3):
     symbol_rate = symbol_rate_detection(sig)
 
@@ -229,36 +211,47 @@ def get_samples(sig, length, throw_out_fraction=0.3):
     return I_results, Q_results
 
 if __name__ == '__main__':
-    input_data = io.get_set_two(cnstln=True)
-    for x in range(0,5):
-        print(input_data[x])
-        print(len(input_data[x]))
+    # I_results, Q_results = get_samples(sig, length)
+    set_two = False
+    SIG_INDEX = 16
+    print("SIG_INDEX: ", SIG_INDEX)
+    if set_two:
+        input_data = io.get_set_two()
+    else:
+        input_data = io.get_set_one()
+        # for x in range(0,5):
+    #     print(input_data[x])
+    #     print(len(input_data[x]))
+    sig = input_data[SIG_INDEX] # signal
 
     # print("Length we are using: ", length)
     # for i in range(0, len(input_data)):
+    # filtering(None)
     if False:
-        SIG_INDEX = 0
-        print("SIG_INDEX: ", SIG_INDEX)
-        sig = input_data[SIG_INDEX] # signal
-        # get_samples(sig, length)
-
         symbol_rate = symbol_rate_detection(sig)
+    if True:
+        symbol_rate = get_symbol_rate(SIG_INDEX, set_two=set_two)
+        print("symbol_rate", symbol_rate/1e6, " MHz")
         # length = int(min(len(sig), 100e3)//2)
-        length = int(min(len(sig), 1000)//2)
+        length = int(min(len(sig), 200e3)//2)
         # IQ signals
         sigI = sig[0:length*2:2]
         sigQ = sig[1:length*2:2]
         mf_sigI, mf_sigQ, Ts, nos = matched_filtering(sigI, sigQ, symbol_rate, length)
-        plt.plot(sigI, color='red')
-        plt.plot(mf_sigI, color='orange')
-        plt.plot(sigQ, color='blue')
-        plt.plot(mf_sigQ, color='cyan')
-        plt.show()
+        if True:
+            plotpsd(sigI + 1j*sigQ)
+            plotpsd(np.abs(sigI + 1j*sigQ))
+            plotpsd(mf_sigI + 1j*mf_sigQ)
+            plotpsd(np.abs(mf_sigI + 1j*mf_sigQ))
+        if False:
+            plt.plot(sigI, color='red')
+            plt.plot(mf_sigI, color='orange')
+            plt.plot(sigQ, color='blue')
+            plt.plot(mf_sigQ, color='cyan')
+            plt.show()
 
-        print("Ts", Ts, "nos", nos)
-        # I_results, Q_results = sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction)
-
-        # I_results, Q_results = get_samples(sig, length)
+        print("Ts", Ts, "nos", nos, "symbol_rate", symbol_rate/1e6, " MHz")
+        # I_results, Q_results = sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction=0.3)
         # plt.scatter(I_results, Q_results)
         # plt.show()
 
