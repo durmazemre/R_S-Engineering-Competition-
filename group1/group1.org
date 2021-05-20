@@ -100,5 +100,11 @@ CW
 
 17 --> maybe 10 MHz?
 18 --> maybe 9.2 MHz?
-
+* finals signal set
+index        freq (MHz)     mod                   sampling offset
+0            40             64QAM                 0.5855
+1            40             16QAM                 0.8449 (var: 0.00164)
+2            31.25          32QAM (probably)      0.5123
+3            12.5           64QAM
+4            25             16QAm
 

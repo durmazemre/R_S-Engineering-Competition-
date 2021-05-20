@@ -132,26 +132,28 @@ def sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction):
     for i in range(SAMPLES_COUNT):
         try:
             sampler(i, offset)
+            disc = error_detector(i, offset)
         except ValueError as e: # TODO
             print(e)
             SAMPLES_COUNT = i
             break
-
-        disc = error_detector(i, offset)
         error = loop_filter(disc)
         offset += error
         offset_array[i] = offset # DEBUG
-        # print("offset: ", offset)
+        if i % 10 == 0:
+            print("offset: ", offset)
         # print("filter.I", loop_filter.I, "error", error)
 
     #########
     # RESULTS
     #########
-    print("offset mean", np.mean(offset_array), "\n"
+    THROW_OUT = int(SAMPLES_COUNT*throw_out_fraction)
+    print("offset mean", np.mean(offset_array), "\n",
+          "offset (thrown out) mean", np.mean(offset_array[THROW_OUT:]), "\n",
           "offset var", np.var(offset_array), "\n"
           "offset [max, min]", [max(offset_array), min(offset_array)])
     #print("sample_times[0]", sample_times[0])
-    tmp_diff_sample_times = [sample_times[x] - sample_times[x-1] for x in range(1, len(sample_times))]
+    tmp_diff_sample_times = [sample_times[x] - sample_times[x-1] for x in range(1, SAMPLES_COUNT)]
     # print("diff sample_times", "min", min(tmp_diff_sample_times), "max", max(tmp_diff_sample_times))
     print("sample period mean", np.mean(tmp_diff_sample_times), "\n"
           "sample period var", np.var(tmp_diff_sample_times), "\n"
@@ -161,7 +163,6 @@ def sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction):
     # plt.scatter(I_sample_times, I_samples, c='orange')
     # plt.scatter(sample_times, Q_samples, c='cyan')
     # plt.show()
-    THROW_OUT = int(SAMPLES_COUNT*throw_out_fraction)
     print("THROWING OUT", THROW_OUT, "out of", SAMPLES_COUNT, "samples")
     I_results = I_samples[THROW_OUT:]
     Q_results = Q_samples[THROW_OUT:]
@@ -212,8 +213,8 @@ def get_samples(sig, length, throw_out_fraction=0.3):
 
 if __name__ == '__main__':
     # I_results, Q_results = get_samples(sig, length)
-    set_two = False
-    SIG_INDEX = 16
+    set_two = True
+    SIG_INDEX = 3
     print("SIG_INDEX: ", SIG_INDEX)
     if set_two:
         input_data = io.get_set_two()
@@ -223,37 +224,39 @@ if __name__ == '__main__':
     #     print(input_data[x])
     #     print(len(input_data[x]))
     sig = input_data[SIG_INDEX] # signal
+    print("full length", len(sig)//2)
 
     # print("Length we are using: ", length)
     # for i in range(0, len(input_data)):
     # filtering(None)
     if False:
         symbol_rate = symbol_rate_detection(sig)
-    if False:
+    if True:
         symbol_rate = get_symbol_rate(SIG_INDEX, set_two=set_two)
         print("symbol_rate", symbol_rate/1e6, " MHz")
         # length = int(min(len(sig), 100e3)//2)
-        length = int(min(len(sig), 200e3)//2)
+        length = int(min(len(sig), 20e3)//2)
+
         # IQ signals
         sigI = sig[0:length*2:2]
         sigQ = sig[1:length*2:2]
         mf_sigI, mf_sigQ, Ts, nos = matched_filtering(sigI, sigQ, symbol_rate, length)
-        if True:
-            plotpsd(sigI + 1j*sigQ)
-            plotpsd(np.abs(sigI + 1j*sigQ))
-            plotpsd(mf_sigI + 1j*mf_sigQ)
-            plotpsd(np.abs(mf_sigI + 1j*mf_sigQ))
         if False:
-            plt.plot(sigI, color='red')
-            plt.plot(mf_sigI, color='orange')
-            plt.plot(sigQ, color='blue')
-            plt.plot(mf_sigQ, color='cyan')
-            plt.show()
+            plotpsd(sigI + 1j*sigQ, details=False)
+            plotpsd(np.abs(sigI + 1j*sigQ))
+            plotpsd(mf_sigI + 1j*mf_sigQ, details=False)
+            plotpsd(np.abs(mf_sigI + 1j*mf_sigQ))
+        else:
+            if False:
+                plt.plot(sigI, color='red')
+                plt.plot(mf_sigI, color='orange')
+                # plt.plot(sigQ, color='blue')
+                # plt.plot(mf_sigQ, color='cyan')
+                plt.show()
 
         print("Ts", Ts, "nos", nos, "symbol_rate", symbol_rate/1e6, " MHz")
-        # I_results, Q_results = sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction=0.3)
-        # plt.scatter(I_results, Q_results)
-        # plt.show()
-
+        I_results, Q_results = sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction=0.5)
+        plt.scatter(I_results, Q_results)
+        plt.show()
 
 
