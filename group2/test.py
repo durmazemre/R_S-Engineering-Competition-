@@ -1,15 +1,16 @@
-import data_io_ingestion as io
 import os
 import sys
 import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath("../group1/"))
+sys.path.append(os.path.abspath("../common/"))
+import data_io_ingestion as io
+
 import get_samples
 import functions
 
-# GET SIGNAL
-SIGNALS_DIR = "../Public_Data/"
-input_data, data_characteristics = io.inventory_data(SIGNALS_DIR, verbose=True)
+input_data = io.get_set_one() # 19 signals
+# input_data = io.get_set_two() # 5 signals
 SIG_INDEX = 12
 sig = input_data[SIG_INDEX] # signal
 
