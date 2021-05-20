@@ -21,15 +21,21 @@ def get_power(signal_index)
 
 
 # main functions
-# detection, içine modulation alphabet alır, aynı zamanda sample'leri de alır.
-# # verdiği şey ise kaçıncı sembole map ettiğidir. yani bir indextir
-def detection(samples, mod): # mod = "QAM64", ....
-    # make sure it's normalized or has the correct size
-    ideal_cnstln = get_constln(mod)
-    ideal_cnstln = rotate(get_rotation(...), ideal_cnstln)
+def detection(samples, const):
 
-    # do nearest distance decoding
-    return detected_samples
+    idx_list = np.array([])
+    mod_ord = const.shape[0]
+
+    for sample_idx in range(samples.shape[0]):
+
+        diff_list = np.array([])
+        for sym_idx in range(mod_ord):
+            diff = np.absolute(const[sym_idx] - samples[sample_idx])
+            diff_list = np.append(diff_list, diff)
+        min_idx = np.argmin(diff_list)
+        idx_list = np.append(idx_list, min_idx)
+
+    return idx_list
 
 
 def map_to_bits(detected_samples):
