@@ -225,6 +225,7 @@ def get_samples(sig, throw_out_fraction=0.3):
     return I_results, Q_results
 
 if __name__ == '__main__':
+#def main(SIG_INDEX, length, throw_out_fraction):
     # SIG_INDEX = 18
     for SIG_INDEX in range(4, 5):
         print("SIG_INDEX: ", SIG_INDEX)
