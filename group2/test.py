@@ -9,9 +9,9 @@ import data_io_ingestion as io
 import get_samples
 import functions
 
-input_data = io.get_set_one() # 19 signals
-# input_data = io.get_set_two() # 5 signals
-SIG_INDEX = 12
+# input_data = io.get_set_one() # 19 signals
+input_data = io.get_set_two() # 5 signals
+SIG_INDEX = 0
 sig = input_data[SIG_INDEX] # signal
 
 # SAMPLING
