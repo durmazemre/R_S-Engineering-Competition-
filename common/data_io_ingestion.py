@@ -85,9 +85,23 @@ def inventory_data(input_dir,verbose, *args):
 def get_set_one(verbose=False):
        i,d = inventory_data(SIGNALS_DIR, verbose=False)
        return i
-def get_set_two(verbose=False):
+def get_set_two(verbose=False, cnstln=False):
        i,d = inventory_data(SIGNALS2_DIR, verbose=False)
-       return i[5:]
+       if cnstln:
+            return i[:5]
+       else:
+            return i[5:]
+
+def get_symbol_rate(SIG_INDEX, set_two=False):
+    if not set_two:
+        dictionary = {0:5, 1:21.26, 2:25, 3:13.11, 4:30.73, 5:7.79, 6:15.66, 7:15.75, 8:8.23, 9:5, 10:20.0, 11:17.82, 12:12.05, 13:33.2, 14:5.0, 15:5.0, 16:1.52}
+        symbol_rate = dictionary.get(SIG_INDEX, None)
+    else:
+        dictionary = {0:40, 1:40, 2:31.25, 3:12.5, 4:25}
+        symbol_rate = dictionary.get(SIG_INDEX, None)
+    if symbol_rate is not None:
+        symbol_rate *= 1e6
+    return symbol_rate
 
 
 def write_result(output_path, verbose, symbol_rate_guess, modulation_type_guess, modulation_order_guess, EVM):
