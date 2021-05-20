@@ -80,9 +80,9 @@ def create_constellation(mod_type, M):
 
 
 if __name__ == "__main__":
-    SNR_dB = 0
+    SNR_dB = 13
     sig_pwr = 1
-    mod_ord = 32
+    mod_ord = 64
     num_samples = 50000
     modulation = "QAM"
     rotation = 45  # in degrees
@@ -93,4 +93,9 @@ if __name__ == "__main__":
     tr_pow = np.mean(np.abs(tr_sym) ** 2)
     rec_pow = np.mean(np.abs(rec_sym) ** 2)
 
+    norm_sym = rec_sym / rec_pow
+
+    rec_pow2 = np.mean(np.abs(norm_sym) ** 2)
+
     plot_const(rec_sym)
+    plot_const(norm_sym / rec_pow)
