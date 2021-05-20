@@ -158,8 +158,9 @@ def sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction):
     # SAMPLING LOOP
     ###############
     offset_array = np.empty(SAMPLES_COUNT) # DEBUG
-    offset = 0.5 # initialize
-    offset = 0.5855 # TODO TODO TODO
+    # offset = 0.5 # initialize
+    offset = 0.974 # TODO TODO TODO
+    # offset = 0.5855 # TODO TODO TODO
     for i in range(SAMPLES_COUNT):
         # try:
         sampler(i, offset)
@@ -171,7 +172,7 @@ def sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction):
         error = loop_filter(disc)
         offset += error
         offset_array[i] = offset # DEBUG
-        if i % 6000 == 0:
+        if i % 500 == 0:
             print("offset: ", offset)
         # print("filter.I", loop_filter.I, "error", error)
 
@@ -245,7 +246,7 @@ def get_samples(sig, length, throw_out_fraction=0.3):
 if __name__ == '__main__':
     # I_results, Q_results = get_samples(sig, length)
     set_two = True
-    SIG_INDEX = 0
+    SIG_INDEX = 1
     print("SIG_INDEX: ", SIG_INDEX)
     if set_two:
         input_data = io.get_set_two()
@@ -256,6 +257,10 @@ if __name__ == '__main__':
     #     print(len(input_data[x]))
     sig = input_data[SIG_INDEX] # signal
     print("full length (as IQ pairs)", len(sig)//2)
+
+    I_results, Q_results = io.load_samples(SIG_INDEX)
+    plt.scatter(I_results, Q_results)
+    plt.show()
 
     # print("Length we are using: ", length)
     # for i in range(0, len(input_data)):
@@ -291,7 +296,7 @@ if __name__ == '__main__':
         plt.scatter(I_results, Q_results)
         plt.show()
         print("number of samples saved: ", len(I_results))
-        myutilities.save_file(I_results, Q_results, "sig0")
+        myutilities.save_file(I_results, Q_results, "sig" + str(SIG_INDEX))
 
 
 

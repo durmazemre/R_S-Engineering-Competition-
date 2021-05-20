@@ -95,7 +95,9 @@ def get_set_two(verbose=False, cnstln=False):
 
 # example call:
 #         I_results, Q_results = load_samples('sig0')
-def load_samples(filename)
+def load_samples(SIG_INDEX, filename=None):
+    if filename is None:
+        filename = 'sig' + str(SIG_INDEX)
     path = SAMPLES_DIR + filename + '.npy'
     data = np.load(path)
     I_results = np.real(data)
