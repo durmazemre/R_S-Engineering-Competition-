@@ -1,10 +1,10 @@
-import data_io_ingestion as io
 import os
 import sys
 import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath("../group1/"))
 import get_samples
+import data_io_ingestion as io
 import functions
 
 # GET SIGNAL
