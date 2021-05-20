@@ -1,3 +1,15 @@
+import sys
+import os
+sys.path.append(os.path.abspath("../common/"))
+import data_io_ingestion as io
+import numpy as np
+import matplotlib.pyplot as plt
+
+sys.path.append(os.path.abspath("../group1/"))
+import get_samples
+
+
+
 # utility functions
 def get_rotation(signal_index):
     if signal_index == "1"
@@ -9,6 +21,8 @@ def get_power(signal_index)
 
 
 # main functions
+# detection, içine modulation alphabet alır, aynı zamanda sample'leri de alır.
+# # verdiği şey ise kaçıncı sembole map ettiğidir. yani bir indextir
 def detection(samples, mod): # mod = "QAM64", ....
     # make sure it's normalized or has the correct size
     ideal_cnstln = get_constln(mod)
@@ -37,4 +51,77 @@ def map_to_image(bitstream):
 
     # reshape to 256x256
     numpy_array.tofile("image.bin")
+
+    def sym2bitdict():
+        # TODO: Find a way to append 0's
+        input_data = io.get_set_two(cnstln=True)
+        for k in range(0, 5):
+            if k == 0:
+                sep_bpsk_const = input_data[k]
+                real_bpsk = sep_bpsk_const[0::2]
+                imag_bpsk = sep_bpsk_const[1::2]
+                bpsk_const = real_bpsk + 1j * imag_bpsk
+
+                binary = np.array(np.zeros((2)))
+
+                for j in range(2):
+                    binary[j] = bin(int(j))[2:].zfill(8)
+
+                bpsk_dict = dict(zip(binary, bpsk_const))
+
+            elif k == 4:
+                sep_qpsk_const = input_data[k]
+                real_qpsk = sep_qpsk_const[0::2]
+                imag_qpsk = sep_qpsk_const[1::2]
+                qpsk_const = real_qpsk + 1j * imag_qpsk
+
+                binary = np.array(np.zeros((4)))
+
+                for j in range(4):
+                    binary[j] = bin(int(j))[2:].zfill(8)
+
+                qpsk_dict = dict(zip(binary, qpsk_const))
+            elif k == 1:
+
+                sep_16qam_const = input_data[k]
+                real_16qam = sep_16qam_const[0::2]
+                imag_16qam = sep_16qam_const[1::2]
+                qam16_const = real_16qam + 1j * imag_16qam
+
+                binary = np.array(np.zeros((16)))
+
+                for j in range(16):
+                    binary[j] = bin(int(j))[2:].zfill(8)
+
+                qam16_dict = dict(zip(binary, qam16_const))
+
+            elif k == 2:
+
+                sep_32qam_const = input_data[k]
+                real_32qam = sep_32qam_const[0::2]
+                imag_32qam = sep_32qam_const[1::2]
+                qam32_const = real_32qam + 1j * imag_32qam
+
+                binary = np.array(np.zeros((32)))
+
+                for j in range(32):
+                    binary[j] = bin(int(j))[2:].zfill(8)
+
+                qam32_dict = dict(zip(binary, qam32_const))
+
+            elif k == 3:
+
+                sep_64qam_const = input_data[k]
+                real_64qam = sep_64qam_const[0::2]
+                imag_64qam = sep_64qam_const[1::2]
+                qam64_const = real_64qam + 1j * imag_64qam
+
+                binary = np.array(np.zeros((64)))
+
+                for j in range(64):
+                    binary[j] = bin(int(j))[2:].zfill(8)
+
+                qam64_dict = dict(zip(binary, qam64_const))
+
+        return bpsk_dict, qpsk_dict, qam16_dict, qam32_dict, qam64_dict
 
