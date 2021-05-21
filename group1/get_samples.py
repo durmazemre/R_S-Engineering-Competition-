@@ -296,7 +296,7 @@ if __name__ == '__main__':
         plt.scatter(I_results, Q_results)
         plt.show()
         print("number of samples saved: ", len(I_results))
-        myutilities.save_file(I_results, Q_results, "sig" + str(SIG_INDEX))
+        myutilities.save_file(I_results, Q_results, "sig" + str(SIG_INDEX) + "_another")
 
 
 
