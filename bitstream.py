@@ -16,9 +16,7 @@ def unscramble(bitstream):
         for i in p:
             out.append(np.bitwise_xor(i, bitstream[i]))
         bitstream = bitstream[k:]
-        n = n + 1
-
-        
+        n = n + 1    
     return out
 
 
@@ -28,34 +26,29 @@ def unscramble(bitstream):
 bitstream = np.array([1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0,1,0,1,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1])
 print(len(bitstream))
 out = unscramble(bitstream)
-
-
-print(len(out))
-print(out)
-
 ## test over
 ############################################
 
 def map_to_image(out):
-    # e.g. bitstream = [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, ....]
-    # bytestream = [24, 255, 0, 3, 42, ...]
-    # reshape to 256x256
-    # numpy_array.tofile("image.bin")
-    # out = np.array2string(out)
-
-
     bytes_stream = []
+    bin_byte = []
     for i in out:
         i = str(i)
-        bytes_stream.append(int(i, 2))
+        bin_byte.append(i)
+        if len(bin_byte) == 8:
+            bin_con = int(bin_byte, 2)
+            length = math.ceil(math.log(bin_con, 256))
+            bin_con = int.to_bytes(bin_con, length=length, byteorder='big', signed=False)
+            
+            bin_byte = []
+
+    # image = numpy.reshape(bytes_stream,(256,256))
+    # image.tofile("image.bin")
 
     return bytes_stream
 
-
-
 bytes_stream = map_to_image(out)
 
-print(bytes_stream)
 out_new = map_to_image(out)
 print(type(out_new))
 print(bytes_stream)
