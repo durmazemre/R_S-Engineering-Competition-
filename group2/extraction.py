@@ -195,33 +195,31 @@ def unscramble(bitstream):
 
     return out
 
+def combine_images():
+    path = '../FINALS OUTPUT/'
+    im0 = np.fromfile(path + 'image0.bin', dtype='uint8')
+    im1 = np.fromfile(path + 'image1.bin', dtype='uint8')
+    im0 = im0.astype('uint32')
+    im1 = im1.astype('uint32')
+    imres = im0 + im1
+    np.clip(imres, 0, 255, out=imres)
+    imres = imres.astype('uint8')
 
-def map_to_image(out):
-    bytes_stream = []
-    bin_byte = []
-    for i in out:
-        i = str(i)
-        bin_byte.append(i)
-        if len(bin_byte) == 8:
-            bin_con = int(bin_byte, 2)
-            length = math.ceil(math.log(bin_con, 256))
-            bin_con = int.to_bytes(bin_con, length=length, byteorder='big', signed=False)
-            
-            bin_byte = []
+    # imres = np.copy(im0)
+    # for i, pix in enumerate(im0):
+    #     if pix == 0:
+    #         imres[i] = im1[i]
+    # #######################
+    # imres = (im0 + im1)//2
 
-    # image = numpy.reshape(bytes_stream,(256,256))
-    # image.tofile("image.bin")
+    image = np.reshape(imres,(256,256))
+    image.tofile(path + "image_res" + ".bin")
 
-    return bytes_stream
-
-# def map_to_image(bitstream):
-    # e.g. bitstream = [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, ....]
-
-    # convert to bytes
-    # bytestream = [24, 255, 0, 3, 42, ...]
-
-    # reshape to 256x256
-    # numpy_array.tofile("image.bin")
+def test():
+    im0 = np.fromfile('image0.bin', dtype='uint8')
+    imx = np.fromfile('image2plus1.bin', dtype='uint8')
+    print(sum(abs(im0 - imx)))
+    print(np.count_nonzero(im0 - imx))
 
 if __name__ == '__main__':
     main_function()
