@@ -7,11 +7,14 @@ import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath("../group1/"))
 import get_samples
+sys.path.append(os.path.abspath("../group2/"))
+import data_generation
 
 
 def sym2bitdict():
     #TODO: Find a way to append 0's
     input_data = io.get_set_two(cnstln=True)
+    #binary_repr_vec = np.vectorize(np.binary_repr)
     for k in range(0, 5):
         if k == 0:
             sep_bpsk_const = input_data[k]
@@ -33,14 +36,14 @@ def sym2bitdict():
             imag_qpsk = sep_qpsk_const[1::2]
             qpsk_const = real_qpsk + 1j * imag_qpsk
 
-            binary = np.array(np.zeros((4)))
+            binary = np.array(np.zeros((4,2)))
 
             for j in range(4):
-                binary[j] = bin(int(j))[2:].zfill(8)
-                #np.array(list(np.binary_repr(j).zfill(2))).astype(np.int8)
-                #np.array(list(np.binary_repr(num).zfill(m))).astype(np.int8)
 
-            qpsk_dict = dict(zip(binary, qpsk_const))
+                binary[j,:] = np.array(list(np.binary_repr(j).zfill(2))).astype(np.int8)
+                #qpsk_dict[j] = dict(zip(binary[j,:], qpsk_const[j]))
+
+
         elif k == 1:
 
             sep_16qam_const = input_data[k]
@@ -147,16 +150,37 @@ if __name__ == '__main__':
 
         rot_norm_samples = normalize_signal(rot_norm_samples)
 
-        plt.scatter(np.real(rot_norm_samples), np.imag(rot_norm_samples), color='b')
+        #plt.scatter(np.real(rot_norm_samples), np.imag(rot_norm_samples), color='b')
         #plt.scatter(np.real(norm_samples), np.imag(norm_samples), color='g')
-        plt.scatter(np.real(norm_const), np.imag(norm_const),color='r')
-        plt.show()
+        #plt.scatter(np.real(norm_const), np.imag(norm_const),color='r')
+        #plt.show()
 
         print(samples.shape[0])
 
-        detection(rot_norm_samples, norm_const)
+    """
+            M=64
+            num_sym = 1000
+            const_plot = None
+            mod_type = "QAM"
+            sig_pwr = 1
 
+            #art_dat = data_generation.transmitter(M, num_sym, mod_type, const_plot, sig_pwr)
 
+            index = np.random.randint(0, M, (1, num_sym))
+            alphabet = data_generation.create_constellation(mod_type, M)
+            mean_amp_const = np.sqrt(np.mean(alphabet * np.conj(alphabet)))
+            norm_alp = alphabet * np.sqrt(sig_pwr) / mean_amp_const
+
+            art_dat = norm_alp[index]
+            art_dat = np.reshape(art_dat, (np.size(art_dat), -1))
+            norm_cons = np.reshape(norm_const, (np.size(norm_const), -1))
+            rec = detection(art_dat, norm_const)
+
+            plt.scatter(np.real(art_dat), np.imag(art_dat), color='b')
+            # plt.scatter(np.real(norm_samples), np.imag(norm_samples), color='g')
+            plt.scatter(np.real(norm_const), np.imag(norm_const), color='r')
+            plt.show()
+           """
 
 
 
