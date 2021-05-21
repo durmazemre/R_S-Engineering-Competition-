@@ -80,12 +80,12 @@ def create_constellation(mod_type, M):
 
 
 if __name__ == "__main__":
-    SNR_dB = 13
+    SNR_dB = None
     sig_pwr = 1
-    mod_ord = 64
+    mod_ord = 2
     num_samples = 50000
-    modulation = "QAM"
-    rotation = 45  # in degrees
+    modulation = "PSK"
+    rotation = None  # in degrees
     plot_const_diag = True
     tr_sym = transmitter(mod_ord, num_samples, modulation, plot_const_diag, sig_pwr)
     rec_sym = channel(SNR_dB, sig_pwr, tr_sym, rotation)
