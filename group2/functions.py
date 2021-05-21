@@ -5,8 +5,10 @@ def detect_mod_type(real_sym,imag_sym):
     sym = real_sym + 1j * imag_sym
     power = np.sqrt(sym * np.conjugate(sym))
     ratio = np.amax(power) / np.amin(power)
+    mag_sig = np.abs(sym)
+    norm_var = np.var(mag_sig) / np.mean(mag_sig ** 2)
 
-    if ratio < 3: #7'den büyük ise 64qam olabilir!
+    if norm_var < 0.1: #7'den büyük ise 64qam olabilir!
         est_mod_type = "PSK"
     elif ratio > 3 and ratio < 7:
         est_mod_type = "Not_known"

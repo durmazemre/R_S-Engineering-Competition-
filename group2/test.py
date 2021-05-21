@@ -1,6 +1,9 @@
 import os
 import sys
 import matplotlib.pyplot as plt
+import numpy as np
+
+import data_generation
 
 sys.path.append(os.path.abspath("../group1/"))
 sys.path.append(os.path.abspath("../common/"))
@@ -9,23 +12,37 @@ import data_io_ingestion as io
 import get_samples
 import functions
 
+
 # input_data = io.get_set_one() # 19 signals
-input_data = io.get_set_two() # 5 signals
-SIG_INDEX = 0
-sig = input_data[SIG_INDEX] # signal
+#input_data = io.get_set_two() # 5 signals
+#SIG_INDEX = 0
+#sig = input_data[SIG_INDEX] # signal
 
 # SAMPLING
-length = int(min(len(sig), 200e3)//2) # max value is 200000 i.e 400000//2
-throw_out_fraction = 0.3 # should be between 0 and 1
-I_results, Q_results = get_samples.get_samples(sig, length, throw_out_fraction)
-plt.scatter(I_results, Q_results)
+#length = int(min(len(sig), 200e3)//2) # max value is 200000 i.e 400000//2
+#throw_out_fraction = 0.3 # should be between 0 and 1
+#I_results, Q_results = get_samples.get_samples(sig, length, throw_out_fraction)
+
+SNR_dB = 17
+sig_pwr = 1
+mod_ord = 64
+num_samples = 50000
+modulation = "QAM"
+rotation = None  # in degrees
+plot_const_diag = True
+tr_sym = data_generation.transmitter(mod_ord, num_samples, modulation, plot_const_diag, sig_pwr)
+rec_sym = data_generation.channel(SNR_dB, sig_pwr, tr_sym, rotation)
+
+plt.scatter(np.real(rec_sym), np.imag(rec_sym))
 plt.show()
 
+# Normalized variance
+
 # REST
-sys.exit(0)
+#sys.exit(0)
 print("Part1 over")
 
-est_mod_type = functions.detect_mod_type(I_results, Q_results)
+est_mod_type = functions.detect_mod_type(np.real(rec_sym), np.imag(rec_sym))
 
 #est_mod_type = "Not_known"
 print(est_mod_type)
