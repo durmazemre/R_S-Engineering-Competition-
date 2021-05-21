@@ -14,7 +14,7 @@ def unscramble(bitstream):
     while n <= size_fr:
         k = len(p)
         for i in p:
-            out.append(np.bitwise_xor(i, bitstream))
+            out.append(np.bitwise_xor(i, bitstream[i]))
         n += 1
         bitstream = bitstream[k:]
 
@@ -31,5 +31,6 @@ out = unscramble(bitstream)
 
 
 print(len(out))
+print((out))
 ## test over
 ############################################

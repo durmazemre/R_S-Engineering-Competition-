@@ -107,4 +107,6 @@ index        freq (MHz)     mod                   sampling offset
 2            31.25          32QAM (probably)      0.5123
 3            12.5           64QAM
 4            25             16QAm
+* samples files
+8 samples missing (4 from start, 4 at end)
 
