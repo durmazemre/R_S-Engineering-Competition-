@@ -1,3 +1,8 @@
+"""
+Used for the qualifers round and challenge 2 of the finals round.
+This is the "main" file to run the group1 function and the group2 function in the correct order to solve the task.
+"""
+
 import os
 import sys
 import matplotlib.pyplot as plt

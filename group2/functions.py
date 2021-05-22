@@ -1,3 +1,7 @@
+"""
+Used for qualifiers round and challenge 2 of the finals.
+Does constellation recognition based on samples given as input.
+"""
 import numpy as np
 from scipy.cluster.vq import vq, kmeans, whiten
 

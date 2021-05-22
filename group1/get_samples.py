@@ -1,3 +1,10 @@
+"""
+Used for the qualifiers round and challenges 1 & 2 of the finals round.
+Does symbol rate detection, matched filtering and sampling.
+
+The main function to call is get_samples(...) which will perform the above three operations in the right order.
+"""
+
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,6 +15,7 @@ from myutilities import get_rrc_pulse
 from myutilities import plotpsd
 from myutilities import get_sync
 import myutilities
+# import moreutil
 
 sys.path.append(os.path.abspath("../common/"))
 import data_io_ingestion as io
@@ -15,29 +23,6 @@ from data_io_ingestion import get_symbol_rate
 #np.set_printoptions(formatter={'float': '{: 0.4f}'.format})
 
 SAMPLING_RATE = 100e6 # TODO this is also in the myutilities.py file
-
-def lowpass(sig):
-    order = 10
-    Wn = 5e6
-    btype='lowpass'
-    sos = signal.butter(order, Wn, btype, fs=SAMPLING_RATE, output='sos')
-    w, h = signal.sosfreqz(sos, fs=SAMPLING_RATE)
-    plt.plot(w, h)
-    # filtered = signal.sosfilt(sos, sig)
-    filtered = signal.sosfilt(sos, sig)
-    return filtered
-
-def filtering(sig):
-    f_remove = 40e6
-    f_remove = 31.99e6
-    Q=35
-    b, a = signal.iirnotch(f_remove, Q, SAMPLING_RATE)
-    return b, a
-    # freq, h = signal.freqz(b, a, fs=SAMPLING_RATE)
-    # plt.plot(freq, np.log(h))
-    # plt.show()
-    # signal.lfilter(b, a, sig)
-
 
 def symbol_rate_detection(sig):
     tmp_length = len(sig)//2
@@ -158,8 +143,8 @@ def sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction):
     # SAMPLING LOOP
     ###############
     offset_array = np.empty(SAMPLES_COUNT) # DEBUG
-    # offset = 0.5 # initialize
-    offset = 0.974 # TODO TODO TODO
+    offset = 0.5 # initialize
+    # offset = 0.974 # TODO TODO TODO
     # offset = 0.5855 # TODO TODO TODO
     for i in range(SAMPLES_COUNT):
         # try:
@@ -172,7 +157,7 @@ def sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction):
         error = loop_filter(disc)
         offset += error
         offset_array[i] = offset # DEBUG
-        if i % 500 == 0:
+        if i % 100 == 0:
             print("offset: ", offset)
         # print("filter.I", loop_filter.I, "error", error)
 
@@ -225,7 +210,6 @@ def matched_filtering(sigI, sigQ, symbol_rate, length):
     return mf_sigI, mf_sigQ, Ts, nos
 
 
-
 def get_samples(sig, length, throw_out_fraction=0.3):
     symbol_rate = symbol_rate_detection(sig)
 
@@ -246,7 +230,7 @@ def get_samples(sig, length, throw_out_fraction=0.3):
 if __name__ == '__main__':
     # I_results, Q_results = get_samples(sig, length)
     set_two = True
-    SIG_INDEX = 1
+    SIG_INDEX = 2
     print("SIG_INDEX: ", SIG_INDEX)
     if set_two:
         input_data = io.get_set_two()
@@ -258,25 +242,33 @@ if __name__ == '__main__':
     sig = input_data[SIG_INDEX] # signal
     print("full length (as IQ pairs)", len(sig)//2)
 
-    I_results, Q_results = io.load_samples(SIG_INDEX)
-    plt.scatter(I_results, Q_results)
-    plt.show()
+    # I_results, Q_results = io.load_samples(SIG_INDEX)
+    # plt.scatter(I_results, Q_results)
+    # plt.show()
 
     # print("Length we are using: ", length)
     # for i in range(0, len(input_data)):
     # filtering(None)
     if False:
         symbol_rate = symbol_rate_detection(sig)
-    if False:
+    if True:
         symbol_rate = get_symbol_rate(SIG_INDEX, set_two=set_two)
         print("symbol_rate", symbol_rate/1e6, " MHz")
         # length = int(min(len(sig), 100e3)//2)
-        # length = int(min(len(sig), 200e3)//2)
-        length = len(sig)
+        length = int(min(len(sig), 200e3)//2)
+        # length = len(sig)
 
         # IQ signals
         sigI = sig[0:length*2:2]
         sigQ = sig[1:length*2:2]
+
+        # eq_impI, eq_impQ = moreutil.get_imp(short=False)
+        # eq_impI, eq_impQ = moreutil.upsample(eq_impI, eq_impQ)
+        # eq_imp = eq_impI + 1j*eq_impQ
+        # sig_cmplx = np.convolve(sigI + 1j*sigQ, eq_imp, 'same')
+        # sigI = np.real(sig_cmplx)
+        # sigQ = np.imag(sig_cmplx)
+
         mf_sigI, mf_sigQ, Ts, nos = matched_filtering(sigI, sigQ, symbol_rate, length)
         if False:
             plotpsd(sigI + 1j*sigQ, details=False)
@@ -292,7 +284,7 @@ if __name__ == '__main__':
                 plt.show()
 
         print("Ts", Ts, "nos", nos, "symbol_rate", symbol_rate/1e6, " MHz")
-        I_results, Q_results = sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction=0.0)
+        I_results, Q_results = sampling(mf_sigI, mf_sigQ, Ts, nos, throw_out_fraction=0.5)
         plt.scatter(I_results, Q_results)
         plt.show()
         print("number of samples saved: ", len(I_results))

@@ -1,6 +1,3 @@
-* resources
-QAM constellation shapes
-https://www.electronics-notes.com/articles/radio/modulation/quadrature-amplitude-modulation-types-8qam-16qam-32qam-64qam-128qam-256qam.php
 * public signals info
    Symbol Rate (MHz) Modulation Type Modulation Order
 0                  5             PSK             BPSK
@@ -142,3 +139,6 @@ AFTER
 AFTER
 [-1 -1 -1 -1 -1 -1 -1 -1 -1  1  1  1  1 -1 -1 -1 -1  1 -1 -1]
 114
+* equalizer files
+** signal 2
+4x symbol rate = 125MHZ sample rate

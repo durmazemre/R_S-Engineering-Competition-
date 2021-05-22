@@ -1,3 +1,14 @@
+"""
+Used for challenge 1 of the finals round. This is the "main" file to run to solve this task.
+
+This gets samples using the get_samples function in the group1 folder. Then it does the following:
+1. detect symbols from the samples using nearest-distance decoding
+2. map the detected symbols to bits to obtain a bitstream
+3. find the frame synchronization sequence in the bitstream using correlation
+4. extract the payload that comes after the synchronization sequence and unscramble it
+5. finally convert the unscrambled payload into an image
+"""
+
 import sys
 import os
 sys.path.append(os.path.abspath("../common/"))
@@ -72,7 +83,6 @@ def main_function():
 
     # TODO endianness?
     # print(bitstream)
-    # TODO map to image 
 
 def save_image(payload):
     assert len(payload) % 8 == 0
@@ -87,7 +97,7 @@ def get_sync_index(bitstream, SIG_INDEX):
     if SIG_INDEX == 0: # for sig0.npy
         return 30738
     if SIG_INDEX == 1: # for sig1.npy
-        return 128428 # 652836 (not 1177244 because not enough samples after it) # TODO try others?
+        return 128428 # OR 652836 (not 1177244 because not enough samples after it) # TODO try others?
 
     unitstream = (-1)**bitstream
     print("PAYLOAD FUNCION: ", "length of bitstream", len(bitstream))
@@ -111,6 +121,8 @@ def get_sync_index(bitstream, SIG_INDEX):
 
 
 
+# utility functions
+###################
 def get_known_rotation(SIG_INDEX):
     if SIG_INDEX == 0:
         return 73.5 + 180 # degrees
@@ -118,7 +130,6 @@ def get_known_rotation(SIG_INDEX):
         return 180 + 65 # degrees
         # indices: [ 128428 1177244  652836]
         # correlation: [114 114 114]
-
 def get_known_power(SIG_INDEX):
     if SIG_INDEX == 0:
         return 0.002493394838359623
@@ -144,6 +155,28 @@ def get_cnstln_order(SIG_INDEX):
         return 16
     elif SIG_INDEX == 2:
         return 32 # we think
+
+# def symb_map_tester()
+#     from numpy import random
+#     input_data = io.get_set_two(cnstln=True)
+#     cnstln = input_data[4]
+#     cnstln_r = cnstln[0::2]
+#     cnstln_i = cnstln[1::2]
+#     cnstln = cnstln_r + 1j*cnstln_i
+#     detected_samples = random.choice(cnstln, size=(4))
+#     print(cnstln)
+#     print(detected_samples)
+#     print("-----")
+#     ret = sym2bitdict(len(cnstln), detected_samples)
+#     print(ret)
+
+# def test():
+#     im0 = np.fromfile('image0.bin', dtype='uint8')
+#     imx = np.fromfile('image2plus1.bin', dtype='uint8')
+#     print(sum(abs(im0 - imx)))
+#     print(np.count_nonzero(im0 - imx))
+
+################### utility functions end
 
 # main functions
 def detection(samples, const):
@@ -214,12 +247,6 @@ def combine_images():
 
     image = np.reshape(imres,(256,256))
     image.tofile(path + "image_res" + ".bin")
-
-def test():
-    im0 = np.fromfile('image0.bin', dtype='uint8')
-    imx = np.fromfile('image2plus1.bin', dtype='uint8')
-    print(sum(abs(im0 - imx)))
-    print(np.count_nonzero(im0 - imx))
 
 if __name__ == '__main__':
     main_function()

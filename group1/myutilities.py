@@ -1,3 +1,6 @@
+"""
+Helper functions
+"""
 import os
 import sys
 import numpy as np
@@ -98,32 +101,32 @@ def rrc_impulse(t, Ts, rolloff):
         return (1/Ts)*(first_term + second_term)/denom
 
 
-def sampling2(mf_sigI, mf_sigQ, Ts, nos):
-    LEN = len(mf_sigI)
-    #if True:
-    #for PHASE in range(0, min(2*round(nos), 10)):
-    for PHASE in range(7, 12):
-        #for PHASE in [5.5]:
-        #for PHASE in np.arange(0, min(nos+1, 20), 0.5):
-        print("PHASE", PHASE)
-        # PHASE = 0
-        interp_mf_sigI = interpolate.interp1d(range(LEN), mf_sigI)
-        interp_mf_sigQ = interpolate.interp1d(range(LEN), mf_sigQ)
-
-        sample_times = [PHASE + i*nos for i in range(0, int((LEN - PHASE)//nos))]
-        xdata = interp_mf_sigI(sample_times)
-        ydata = interp_mf_sigQ(sample_times)
-
-        plt.title("Phase = " + str(PHASE))
-        plt.scatter(xdata, ydata)
-        plt.show()
-
-        plt.plot(mf_sigI, color='orange')
-        plt.scatter(sample_times, xdata, c='orange')
-        plt.plot(mf_sigQ, color='cyan')
-        plt.scatter(sample_times, ydata, c='cyan')
-        plt.title("Phase = " + str(PHASE))
-        plt.show()
+# def sampling2(mf_sigI, mf_sigQ, Ts, nos):
+#     LEN = len(mf_sigI)
+#     #if True:
+#     #for PHASE in range(0, min(2*round(nos), 10)):
+#     for PHASE in range(7, 12):
+#         #for PHASE in [5.5]:
+#         #for PHASE in np.arange(0, min(nos+1, 20), 0.5):
+#         print("PHASE", PHASE)
+#         # PHASE = 0
+#         interp_mf_sigI = interpolate.interp1d(range(LEN), mf_sigI)
+#         interp_mf_sigQ = interpolate.interp1d(range(LEN), mf_sigQ)
+# 
+#         sample_times = [PHASE + i*nos for i in range(0, int((LEN - PHASE)//nos))]
+#         xdata = interp_mf_sigI(sample_times)
+#         ydata = interp_mf_sigQ(sample_times)
+# 
+#         plt.title("Phase = " + str(PHASE))
+#         plt.scatter(xdata, ydata)
+#         plt.show()
+# 
+#         plt.plot(mf_sigI, color='orange')
+#         plt.scatter(sample_times, xdata, c='orange')
+#         plt.plot(mf_sigQ, color='cyan')
+#         plt.scatter(sample_times, ydata, c='cyan')
+#         plt.title("Phase = " + str(PHASE))
+#         plt.show()
 
 
 # def test():
@@ -193,3 +196,27 @@ def sampling2(mf_sigI, mf_sigQ, Ts, nos):
     # if debug_symbol_rate is not None:
     #     plt.axvline(x=debug_symbol_rate, color='yellow')
     # plt.plot(freqs/1e6, np.angle(ft_sigCmplx), 'b')
+
+
+# def lowpass(sig):
+#     order = 10
+#     Wn = 5e6
+#     btype='lowpass'
+#     sos = signal.butter(order, Wn, btype, fs=SAMPLING_RATE, output='sos')
+#     w, h = signal.sosfreqz(sos, fs=SAMPLING_RATE)
+#     plt.plot(w, h)
+#     # filtered = signal.sosfilt(sos, sig)
+#     filtered = signal.sosfilt(sos, sig)
+#     return filtered
+# 
+# def filtering(sig):
+#     f_remove = 40e6
+#     f_remove = 31.99e6
+#     Q=35
+#     b, a = signal.iirnotch(f_remove, Q, SAMPLING_RATE)
+#     return b, a
+#     # freq, h = signal.freqz(b, a, fs=SAMPLING_RATE)
+#     # plt.plot(freq, np.log(h))
+#     # plt.show()
+#     # signal.lfilter(b, a, sig)
+# 

@@ -1,3 +1,6 @@
+"""
+Contains helper functions to generate artificial/synthetic noisy samples from a particular constellation.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.cluster.vq import kmeans

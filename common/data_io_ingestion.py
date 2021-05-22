@@ -1,3 +1,7 @@
+"""
+Helper functions to retrieve signals from the .iqw files.
+"""
+
 import os
 import sys
 import glob
